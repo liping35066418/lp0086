@@ -5,6 +5,7 @@ import { TrendingUp } from 'lucide-react';
 
 export function ConsumableChart() {
   const getConsumableUsage = useDashboardStore((state) => state.getConsumableUsage);
+  const refreshKey = useDashboardStore((state) => state.refreshKey);
   const data = getConsumableUsage();
 
   const option = {
@@ -163,7 +164,7 @@ export function ConsumableChart() {
       icon={<TrendingUp className="w-4 h-4" />}
       className="h-full"
     >
-      <ReactECharts option={option} style={{ height: '240px', width: '100%' }} />
+      <ReactECharts key={refreshKey} option={option} style={{ height: '240px', width: '100%' }} />
     </ChartCard>
   );
 }

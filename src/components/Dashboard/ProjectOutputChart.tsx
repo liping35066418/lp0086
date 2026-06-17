@@ -5,6 +5,7 @@ import { BarChart3 } from 'lucide-react';
 
 export function ProjectOutputChart() {
   const getProjectOutput = useDashboardStore((state) => state.getProjectOutput);
+  const refreshKey = useDashboardStore((state) => state.refreshKey);
   const data = getProjectOutput();
 
   const option = {
@@ -122,7 +123,7 @@ export function ProjectOutputChart() {
       icon={<BarChart3 className="w-4 h-4" />}
       className="h-full"
     >
-      <ReactECharts option={option} style={{ height: '240px', width: '100%' }} />
+      <ReactECharts key={refreshKey} option={option} style={{ height: '240px', width: '100%' }} />
     </ChartCard>
   );
 }

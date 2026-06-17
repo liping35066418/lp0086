@@ -6,6 +6,7 @@ import { EQUIPMENTS, TIME_SLOTS } from '@/types';
 
 export function EquipmentHeatmap() {
   const getHeatmapData = useDashboardStore((state) => state.getHeatmapData);
+  const refreshKey = useDashboardStore((state) => state.refreshKey);
   const rawData = getHeatmapData();
 
   const data = rawData.map((item) => [
@@ -125,7 +126,7 @@ export function EquipmentHeatmap() {
       icon={<Flame className="w-4 h-4" />}
       className="h-full"
     >
-      <ReactECharts option={option} style={{ height: '320px', width: '100%' }} />
+      <ReactECharts key={refreshKey} option={option} style={{ height: '320px', width: '100%' }} />
     </ChartCard>
   );
 }

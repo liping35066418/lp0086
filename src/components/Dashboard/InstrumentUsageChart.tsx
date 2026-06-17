@@ -5,6 +5,7 @@ import { Activity } from 'lucide-react';
 
 export function InstrumentUsageChart() {
   const getInstrumentUsage = useDashboardStore((state) => state.getInstrumentUsage);
+  const refreshKey = useDashboardStore((state) => state.refreshKey);
   const data = getInstrumentUsage();
 
   const option = {
@@ -131,7 +132,7 @@ export function InstrumentUsageChart() {
       icon={<Activity className="w-4 h-4" />}
       className="h-full"
     >
-      <ReactECharts option={option} style={{ height: '240px', width: '100%' }} />
+      <ReactECharts key={refreshKey} option={option} style={{ height: '240px', width: '100%' }} />
     </ChartCard>
   );
 }

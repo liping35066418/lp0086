@@ -4,6 +4,7 @@ import { FlaskConical, Gauge, FolderKanban, DollarSign } from 'lucide-react';
 
 export function CoreMetrics() {
   const getCoreMetrics = useDashboardStore((state) => state.getCoreMetrics);
+  useDashboardStore((state) => state.refreshKey);
   const metrics = getCoreMetrics();
 
   return (

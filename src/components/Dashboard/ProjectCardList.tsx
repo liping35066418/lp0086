@@ -6,6 +6,7 @@ import { FolderKanban } from 'lucide-react';
 export function ProjectCardList() {
   const getProjects = useDashboardStore((state) => state.getProjects);
   const openProjectDetail = useDashboardStore((state) => state.openProjectDetail);
+  useDashboardStore((state) => state.refreshKey);
   const projects = getProjects();
 
   const lowOutputCount = projects.filter((p) => p.lowOutput).length;

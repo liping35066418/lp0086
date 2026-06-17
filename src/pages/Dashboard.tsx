@@ -9,9 +9,12 @@ import { FilterBar } from '@/components/Dashboard/FilterBar';
 import { ProjectDetailModal } from '@/components/Dashboard/ProjectDetailModal';
 import { Monitor, RefreshCw, Clock } from 'lucide-react';
 import { useState, useEffect } from 'react';
+import { useDashboardStore } from '@/store/useDashboardStore';
 
 export default function Dashboard() {
   const [currentTime, setCurrentTime] = useState(new Date());
+  const refreshData = useDashboardStore((state) => state.refreshData);
+  const isRefreshing = useDashboardStore((state) => state.isRefreshing);
 
   useEffect(() => {
     const timer = setInterval(() => {
@@ -26,6 +29,12 @@ export default function Dashboard() {
 
   const formatTime = (date: Date) => {
     return `${String(date.getHours()).padStart(2, '0')}:${String(date.getMinutes()).padStart(2, '0')}:${String(date.getSeconds()).padStart(2, '0')}`;
+  };
+
+  const handleRefresh = () => {
+    if (!isRefreshing) {
+      refreshData();
+    }
   };
 
   return (
@@ -60,8 +69,12 @@ export default function Dashboard() {
                   {formatTime(currentTime)}
                 </div>
               </div>
-              <button className="p-2 rounded-lg bg-slate-800/60 border border-slate-700/50 text-slate-400 hover:text-cyan-400 hover:border-cyan-500/30 transition-all">
-                <RefreshCw className="w-5 h-5" />
+              <button
+                onClick={handleRefresh}
+                disabled={isRefreshing}
+                className="p-2 rounded-lg bg-slate-800/60 border border-slate-700/50 text-slate-400 hover:text-cyan-400 hover:border-cyan-500/30 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                <RefreshCw className={`w-5 h-5 ${isRefreshing ? 'animate-spin text-cyan-400' : ''}`} />
               </button>
             </div>
           </div>
