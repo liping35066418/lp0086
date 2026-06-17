@@ -63,6 +63,7 @@ export interface FilterState {
   period: 'month' | 'quarter';
   lab: string;
   category: string;
+  showLowOutputOnly: boolean;
 }
 
 export const LABS = [

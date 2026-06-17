@@ -1,4 +1,4 @@
-import { Users, Clock, FileText, AlertTriangle } from 'lucide-react';
+import { Users, FileText, AlertTriangle } from 'lucide-react';
 import type { Project } from '@/types';
 
 interface ProjectCardProps {

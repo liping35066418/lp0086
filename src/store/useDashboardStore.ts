@@ -100,6 +100,8 @@ interface DashboardState {
   setPeriod: (period: 'month' | 'quarter') => void;
   setLab: (lab: string) => void;
   setCategory: (category: string) => void;
+  setShowLowOutputOnly: (show: boolean) => void;
+  toggleLab: (lab: string) => void;
   openProjectDetail: (project: Project) => void;
   closeProjectDetail: () => void;
   refreshData: () => Promise<void>;
@@ -117,6 +119,7 @@ export const useDashboardStore = create<DashboardState>((set, get) => ({
     period: 'month',
     lab: '全部实验室',
     category: '全部类型',
+    showLowOutputOnly: false,
   },
   selectedProject: null,
   isModalOpen: false,
@@ -143,6 +146,11 @@ export const useDashboardStore = create<DashboardState>((set, get) => ({
   setPeriod: (period) => set((state) => ({ filter: { ...state.filter, period } })),
   setLab: (lab) => set((state) => ({ filter: { ...state.filter, lab } })),
   setCategory: (category) => set((state) => ({ filter: { ...state.filter, category } })),
+  setShowLowOutputOnly: (show) => set((state) => ({ filter: { ...state.filter, showLowOutputOnly: show } })),
+  toggleLab: (lab) =>
+    set((state) => ({
+      filter: { ...state.filter, lab: state.filter.lab === lab ? '全部实验室' : lab },
+    })),
 
   openProjectDetail: (project) => set({ selectedProject: project, isModalOpen: true }),
   closeProjectDetail: () => set({ selectedProject: null, isModalOpen: false }),
@@ -179,21 +187,43 @@ export const useDashboardStore = create<DashboardState>((set, get) => ({
         period: 'month',
         lab: '全部实验室',
         category: '全部类型',
+        showLowOutputOnly: false,
       },
     }),
 
   getCoreMetrics: () => {
-    const { period } = get().filter;
-    return period === 'month' ? get().cachedCoreMetrics.month : get().cachedCoreMetrics.quarter;
+    const { period, lab, category, showLowOutputOnly } = get().filter;
+    const baseMetrics =
+      period === 'month' ? get().cachedCoreMetrics.month : get().cachedCoreMetrics.quarter;
+    let projects = period === 'month' ? projectsMonth : projectsQuarter;
+    if (lab !== '全部实验室') {
+      projects = projects.filter((item) => item.labName === lab);
+    }
+    if (category !== '全部类型') {
+      projects = projects.filter((item) => item.category === category);
+    }
+    if (showLowOutputOnly) {
+      projects = projects.filter((item) => item.lowOutput);
+    }
+    const allProjects = period === 'month' ? projectsMonth : projectsQuarter;
+    let labProjects = allProjects;
+    if (lab !== '全部实验室') {
+      labProjects = allProjects.filter((item) => item.labName === lab);
+    }
+    const labRatio = labProjects.length / allProjects.length;
+    return {
+      ...baseMetrics,
+      activeProjects: projects.length,
+      totalExperiments: Math.round(baseMetrics.totalExperiments * labRatio),
+      consumableCost: Number((baseMetrics.consumableCost * labRatio).toFixed(1)),
+    };
   },
 
   getInstrumentUsage: () => {
-    const { period, lab } = get().filter;
-    let data = period === 'month' ? get().cachedInstrumentUsage.month : get().cachedInstrumentUsage.quarter;
-    if (lab !== '全部实验室') {
-      data = data.filter((item) => item.labName === lab);
-    }
-    return data;
+    const { period } = get().filter;
+    return period === 'month'
+      ? get().cachedInstrumentUsage.month
+      : get().cachedInstrumentUsage.quarter;
   },
 
   getProjectOutput: () => {
@@ -211,13 +241,16 @@ export const useDashboardStore = create<DashboardState>((set, get) => ({
   },
 
   getProjects: () => {
-    const { period, lab, category } = get().filter;
+    const { period, lab, category, showLowOutputOnly } = get().filter;
     let data = period === 'month' ? projectsMonth : projectsQuarter;
     if (lab !== '全部实验室') {
       data = data.filter((item) => item.labName === lab);
     }
     if (category !== '全部类型') {
       data = data.filter((item) => item.category === category);
+    }
+    if (showLowOutputOnly) {
+      data = data.filter((item) => item.lowOutput);
     }
     return data;
   },
